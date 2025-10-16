@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Data Siswa Peminjam - Peminjaman Fasilitas SMA</title>
+<style>
+  :root{--bg:#000;--card:#0f1113;--muted:#cbd5db;--accent:#06b6d4}
+  body{margin:0;padding:20px;background:var(--bg);color:var(--muted);font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial}
+  .wrap{max-width:1100px;margin:0 auto;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04)}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+  .logo{width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;border-radius:8px}
+  h1{margin:0;color:#fff;font-size:18px}
+  .controls{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+  .btn{background:linear-gradient(180deg,var(--accent), #0284c7);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+  th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left;color:var(--muted)}
+  th{color:#fff;font-weight:700}
+  .empty{padding:30px;text-align:center;color:var(--muted);border-radius:8px;background:#0b0c0d;margin-top:12px}
+  .row-actions{display:flex;gap:8px}
+  .small{font-size:13px;padding:6px 8px;border-radius:7px;border:none;cursor:pointer}
+  .small.danger{background:#7c2d2d;color:#fff}
+  .small.info{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+  @media (max-width:880px){
+    table, thead, tbody, th, td, tr{display:block}
+    thead{display:none}
+    tr{margin-bottom:12px}
+    td{padding:8px;background:#0b0c0d;border-radius:8px;margin-bottom:6px}
+    td:before{content:attr(data-label);font-weight:700;color:#fff;display:block;margin-bottom:6px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Data Siswa Peminjam</h1>
+        <div style="color:var(--muted);font-size:13px">Daftar peminjaman tersimpan (LocalStorage). Kamu bisa menghapus satu per satu atau hapus semua.</div>
+      </div>
+    </header>
+
+    <div class="controls">
+      <a class="btn" href="formulir.html" style="text-decoration:none">Tambah Peminjam</a>
+      <button class="btn ghost" id="refreshBtn">Muat Ulang</button>
+      <button class="btn" id="clearAllBtn" title="Hapus semua data">Hapus Semua</button>
+    </div>
+
+    <div id="listArea"></div>
+  </div>
+
+<script>
+(function(){
+  const key = 'peminjaman_siswa_v1';
+  const listArea = document.getElementById('listArea');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+
+  function loadData(){
+    try {
+      const raw = localStorage.getItem(key);
+      if(!raw) return [];
+      return JSON.parse(raw);
+    } catch(e){
+      console.error(e);
+      return [];
+    }
+  }
+  function saveData(arr){
+    localStorage.setItem(key, JSON.stringify(arr));
+  }
+
+  function render(){
+    const data = loadData();
+    if(!data.length){
+      listArea.innerHTML = '<div class="empty">Belum ada data peminjaman. Klik "Tambah Peminjam" untuk menambahkan.</div>';
+      return;
+    }
+    let html = '<table><thead><tr><th>Nama</th><th>Kelas</th><th>Barang</th><th>Tgl Pinjam</th><th>Tgl Kembali</th><th>Aksi</th></tr></thead><tbody>';
+    data.forEach(item=>{
+      html += `<tr>
+        <td data-label="Nama">${escapeHtml(item.nama)}</td>
+        <td data-label="Kelas">${escapeHtml(item.kelas)}</td>
+        <td data-label="Barang">${escapeHtml(item.barang)}</td>
+        <td data-label="Tgl Pinjam">${escapeHtml(item.tgl_pinjam)}</td>
+        <td data-label="Tgl Kembali">${escapeHtml(item.tgl_kembali)}</td>
+        <td data-label="Aksi"><div class="row-actions">
+          <button class="small info" onclick="editItem('${item.id}')">Edit</button>
+          <button class="small danger" onclick="deleteItem('${item.id}')">Hapus</button>
+        </div></td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    listArea.innerHTML = html;
+  }
+
+  // helpers
+  function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m];}); }
+
+  window.deleteItem = function(id){
+    if(!confirm('Yakin ingin menghapus data ini?')) return;
+    let data = loadData();
+    data = data.filter(d=>d.id !== id);
+    saveData(data);
+    render();
+  }
+
+  window.editItem = function(id){
+    // for simplicity, editing opens the form and pre-fills values
+    const data = loadData();
+    const item = data.find(d=>d.id===id);
+    if(!item){ alert('Data tidak ditemukan'); return; }
+    // save selected item to temp key and go to form
+    localStorage.setItem(key + '_editing', JSON.stringify(item));
+    window.location.href = 'formulir.html';
+  }
+
+  refreshBtn.addEventListener('click', render);
+  clearAllBtn.addEventListener('click', function(){
+    if(!confirm('Hapus semua data peminjaman? Tindakan ini tidak bisa dibatalkan.')) return;
+    localStorage.removeItem(key);
+    render();
+  });
+
+  // initialize
+  render();
+})();
+</script>
+</body>
+</html>

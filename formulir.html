@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Formulir Peminjam - Peminjaman Fasilitas SMA</title>
+<style>
+  :root{--bg:#000;--card:#0f1113;--accent:#06b6d4;--muted:#cbd5db}
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:20px;
+    font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+    background:var(--bg); color:var(--muted);
+    display:flex;align-items:flex-start;justify-content:center;min-height:100vh;
+  }
+  .wrap{width:100%;max-width:900px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:20px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .logo{width:56px;height:56px;background:linear-gradient(135deg,var(--accent), #7c3aed);display:flex;align-items:center;justify-content:center;border-radius:8px}
+  h1{margin:0;color:#fff;font-size:18px}
+  form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input, select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#070708;color:#fff}
+  .full{grid-column:1/-1}
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+  .btn{background:linear-gradient(180deg,var(--accent), #0284c7);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  .note{font-size:13px;color:var(--muted);margin-top:6px}
+  @media (max-width:720px){
+    form{grid-template-columns:1fr}
+    .actions{justify-content:stretch;flex-direction:column-reverse}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Formulir Peminjam Siswa</h1>
+        <div class="note">Isi data peminjaman. Data akan disimpan secara permanen di browser (LocalStorage).</div>
+      </div>
+    </header>
+
+    <form id="loanForm" onsubmit="return false;">
+      <div>
+        <label for="nama">Nama Siswa</label>
+        <input id="nama" required placeholder="Nama lengkap" />
+      </div>
+      <div>
+        <label for="kelas">Kelas</label>
+        <input id="kelas" required placeholder="10 IPA 1 / 11 IPS 2" />
+      </div>
+      <div class="full">
+        <label for="barang">Barang / Fasilitas yang Dipinjam</label>
+        <select id="barang" required>
+          <option value="">-- Pilih Barang --</option>
+          <option>Proyektor</option>
+          <option>Laptop</option>
+          <option>Bola Basket</option>
+          <option>Bola Voli</option>
+          <option>Sound System</option>
+          <option>Lab Komputer 1</option>
+          <option>Lab Komputer 2</option>
+          <option>Lab Komputer 3</option>
+        </select>
+      </div>
+      <div>
+        <label for="tgl_pinjam">Tanggal Pinjam</label>
+        <input id="tgl_pinjam" type="date" required />
+      </div>
+      <div>
+        <label for="tgl_kembali">Tanggal Kembali</label>
+        <input id="tgl_kembali" type="date" required />
+      </div>
+
+      <div class="full actions">
+        <button class="btn" id="saveBtn">Simpan & Kembali ke Data</button>
+        <a class="btn secondary" href="index.html" style="text-decoration:none;color:inherit;padding:10px 14px;display:inline-flex;align-items:center;justify-content:center">Batal</a>
+      </div>
+    </form>
+  </div>
+
+<script>
+(function(){
+  const key = 'peminjaman_siswa_v1';
+  const form = document.getElementById('loanForm');
+  const saveBtn = document.getElementById('saveBtn');
+
+  function loadData(){
+    try {
+      const raw = localStorage.getItem(key);
+      if(!raw) return [];
+      return JSON.parse(raw);
+    } catch(e){
+      console.error(e);
+      return [];
+    }
+  }
+  function saveData(arr){
+    localStorage.setItem(key, JSON.stringify(arr));
+  }
+  saveBtn.addEventListener('click', function(){
+    const nama = document.getElementById('nama').value.trim();
+    const kelas = document.getElementById('kelas').value.trim();
+    const barang = document.getElementById('barang').value;
+    const tgl_pinjam = document.getElementById('tgl_pinjam').value;
+    const tgl_kembali = document.getElementById('tgl_kembali').value;
+
+    if(!nama || !kelas || !barang || !tgl_pinjam || !tgl_kembali){
+      alert('Mohon lengkapi semua kolom.');
+      return;
+    }
+    const current = loadData();
+    const id = Date.now().toString(36);
+    current.push({id,nama,kelas,barang,tgl_pinjam,tgl_kembali});
+    saveData(current);
+    // clear form
+    form.reset();
+    // redirect to data page
+    window.location.href = 'data.html';
+  });
+})();
+
+// support editing: if an item is present in localStorage under key + '_editing', prefill form for editing
+(function(){
+  const key = 'peminjaman_siswa_v1';
+  try {
+    const editingRaw = localStorage.getItem(key + '_editing');
+    if(editingRaw){
+      const item = JSON.parse(editingRaw);
+      document.getElementById('nama').value = item.nama || '';
+      document.getElementById('kelas').value = item.kelas || '';
+      document.getElementById('barang').value = item.barang || '';
+      document.getElementById('tgl_pinjam').value = item.tgl_pinjam || '';
+      document.getElementById('tgl_kembali').value = item.tgl_kembali || '';
+      // change behavior of save: replace existing id if editing
+      saveBtn.addEventListener('click', function(){
+        const nama = document.getElementById('nama').value.trim();
+        const kelas = document.getElementById('kelas').value.trim();
+        const barang = document.getElementById('barang').value;
+        const tgl_pinjam = document.getElementById('tgl_pinjam').value;
+        const tgl_kembali = document.getElementById('tgl_kembali').value;
+        if(!nama || !kelas || !barang || !tgl_pinjam || !tgl_kembali){
+          alert('Mohon lengkapi semua kolom.');
+          return;
+        }
+        let current = [];
+        try{ current = JSON.parse(localStorage.getItem(key)) || []; }catch(e){ current = []; }
+        // remove old
+        current = current.filter(d => d.id !== item.id);
+        current.push({id: item.id, nama, kelas, barang, tgl_pinjam, tgl_kembali});
+        localStorage.setItem(key, JSON.stringify(current));
+        localStorage.removeItem(key + '_editing');
+        form.reset();
+        window.location.href = 'data.html';
+      }, {once:true});
+    }
+  } catch(e){ console.error(e); }
+})(); 
+</script>
+
+</body>
+</html>

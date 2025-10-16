@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Daftar Fasilitas - Peminjaman Fasilitas SMA</title>
+<style>
+  :root{--bg:#000;--card:#0f1113;--muted:#cbd5db;--accent:#06b6d4}
+  body{margin:0;padding:20px;background:var(--bg);color:var(--muted);font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial}
+  .wrap{max-width:900px;margin:0 auto;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04)}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+  .logo{width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;border-radius:8px}
+  h1{margin:0;color:#fff;font-size:18px}
+  ul{list-style:none;padding:0;margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  li{background:#0b0c0d;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+  li h3{margin:0 0 6px 0;color:#fff;font-size:15px}
+  li p{margin:0;color:var(--muted);font-size:13px}
+  .back{display:inline-block;margin-top:14px;text-decoration:none;color:inherit;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Daftar Fasilitas Sekolah</h1>
+        <div style="color:var(--muted);font-size:13px">Contoh fasilitas yang disediakan sekolah untuk dipinjam oleh siswa.</div>
+      </div>
+    </header>
+
+    <ul>
+      <li>
+        <h3>Proyektor</h3>
+        <p>Perangkat proyeksi untuk kegiatan presentasi atau pembelajaran.</p>
+      </li>
+      <li>
+        <h3>Laptop</h3>
+        <p>Laptop untuk keperluan praktik atau kegiatan sekolah.</p>
+      </li>
+      <li>
+        <h3>Bola Basket</h3>
+        <p>Peralatan olahraga untuk kegiatan ekstrakurikuler dan latihan.</p>
+      </li>
+      <li>
+        <h3>Bola Voli</h3>
+        <p>Peralatan olahraga untuk pertandingan dan latihan voli.</p>
+      </li>
+      <li>
+        <h3>Sound System</h3>
+        <p>Perangkat audio untuk acara sekolah seperti pentas dan rapat.</p>
+      </li>
+      <li>
+        <h3>Lab Komputer 1</h3>
+        <p>Ruang laboratorium komputer untuk pembelajaran praktikum.</p>
+      </li>
+      <li>
+        <h3>Lab Komputer 2</h3>
+        <p>Ruang laboratorium komputer tambahan untuk kegiatan siswa.</p>
+      </li>
+      <li>
+        <h3>Lab Komputer 3</h3>
+        <p>Ruang laboratorium komputer tambahan untuk ujian atau praktikum.</p>
+      </li>
+    </ul>
+
+    <a class="back" href="index.html">← Kembali ke Beranda</a>
+  </div>
+</body>
+</html>
